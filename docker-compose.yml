@@ -2,11 +2,11 @@
 version: '3'
 services:
   backend:
-    image: misacademy/three-tier-app-backend:latest
+    image: ghcr.io/AbdulNasirWaheed/three-tier-app-backend:latest
     ports:
       - "5001:5000"
   frontend:
-    image: misacademy/three-tier-app-frontend:latest
+    image: ghcr.io/AbdulNasirWaheed/three-tier-app-frontend:latest
     ports:
       - "3001:3000"
   mongodb:
