@@ -1,0 +1,15 @@
+# docker-compose.yml (on server)
+version: '3'
+services:
+  backend:
+    image: misacademy/three-tier-app-backend:latest
+    ports:
+      - "5001:5000"
+  frontend:
+    image: misacademy/three-tier-app-frontend:latest
+    ports:
+      - "3001:3000"
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
