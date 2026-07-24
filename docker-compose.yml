@@ -1,15 +1,32 @@
-# docker-compose.yml (on server)
-version: '3'
 services:
   backend:
-    image: ghcr.io/AbdulNasirWaheed/three-tier-app-backend:latest
+    image: ghcr.io/abdulnasirwaheed/three-tier-app-backend:latest
+    restart: unless-stopped
     ports:
       - "5001:5000"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/appdb
+
   frontend:
-    image: ghcr.io/AbdulNasirWaheed/three-tier-app-frontend:latest
+    image: ghcr.io/abdulnasirwaheed/three-tier-app-frontend:latest
+    restart: unless-stopped
     ports:
       - "3001:3000"
+    depends_on:
+      - backend
+
   mongodb:
     image: mongo:latest
-    ports:
-      - "27017:27017"
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    # No ports exposed to host — backend reaches it via the internal
+    # compose network at "mongodb:27017". Uncomment below only if you
+    # need external access, and lock your AWS security group to your IP.
+    # ports:
+    #   - "27017:27017"
+
+volumes:
+  mongo-data:
