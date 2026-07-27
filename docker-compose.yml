@@ -1,19 +1,19 @@
 services:
   backend:
-    image: ghcr.io/abdulnasirwaheed/three-tier-app-backend:latest
+    image: 375973130701.dkr.ecr.us-east-1.amazonaws.com/three-tier-app-backend:latest
     restart: unless-stopped
     ports:
-      - "5001:5000"
+      - "5000:5000"
     depends_on:
       - mongodb
     environment:
       - MONGO_URI=mongodb://mongodb:27017/appdb
 
   frontend:
-    image: ghcr.io/abdulnasirwaheed/three-tier-app-frontend:latest
+    image: 375973130701.dkr.ecr.us-east-1.amazonaws.com/three-tier-app-frontend:latest
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "3000:3000"
     depends_on:
       - backend
 
