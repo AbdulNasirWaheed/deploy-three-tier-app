@@ -16,6 +16,10 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS_ID}",
                     usernameVariable: 'DOCKERHUB_USER',
                     passwordVariable: 'DOCKERHUB_PASS')]) {
+                    script {
+                        // Persist the username into env so later stages can still use it
+                        env.DOCKERHUB_USER = DOCKERHUB_USER
+                    }
                     sh '''
                         echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
                     '''
@@ -25,8 +29,8 @@ pipeline {
         stage('Build & Tag Images') {
             steps {
                 script {
-                    env.FRONTEND_TAG_DH = "${DOCKERHUB_USER}/three-tier-app-frontend:${IMAGE_TAG}"
-                    env.BACKEND_TAG_DH  = "${DOCKERHUB_USER}/three-tier-app-backend:${IMAGE_TAG}"
+                    env.FRONTEND_TAG_DH = "${env.DOCKERHUB_USER}/three-tier-app-frontend:${IMAGE_TAG}"
+                    env.BACKEND_TAG_DH  = "${env.DOCKERHUB_USER}/three-tier-app-backend:${IMAGE_TAG}"
                     sh """
                         docker build -t ${BACKEND_TAG_DH} ./backend
                         docker build -t ${FRONTEND_TAG_DH} ./frontend
