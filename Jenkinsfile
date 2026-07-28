@@ -69,9 +69,9 @@ FRONTEND_IMAGE=${FRONTEND_TAG_DH}
         stage('Deploy Environment') {
             steps {
                 sh """
-                    docker-compose --env-file .env down
-                    docker-compose --env-file .env pull
-                    docker-compose --env-file .env up -d --remove-orphans
+                    docker compose --env-file .env down
+                    docker compose --env-file .env pull
+                    docker compose --env-file .env up -d --remove-orphans
                 """
             }
         }
