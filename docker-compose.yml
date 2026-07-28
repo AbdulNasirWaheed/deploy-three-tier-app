@@ -3,7 +3,7 @@ services:
     image: ${BACKEND_IMAGE}
     restart: unless-stopped
     ports:
-      - "5001:5000"
+      - "5000:5000"
     depends_on:
       - mongodb
     environment:
@@ -13,7 +13,7 @@ services:
     image: ${FRONTEND_IMAGE}
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "3000:3000"
     depends_on:
       - backend
 
