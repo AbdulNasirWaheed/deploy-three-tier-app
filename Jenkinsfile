@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'ec2-dev'}
     environment {
         DOCKERHUB_CREDENTIALS_ID = 'dockerhub_credentials'
         BRANCH_NAME = "${env.BRANCH_NAME}"
@@ -55,17 +55,7 @@ FRONTEND_IMAGE=${FRONTEND_TAG_DH}
                 }
             }
         }
-        stage('Approval for Staging / Prod Deploy') {
-            when {
-                anyOf {
-                    branch 'stg'
-                    branch 'prod'
-                }
-            }
-            steps {
-                input message: "Deploy to ${BRANCH_NAME} environment?", ok: "Yes, Deploy"
-            }
-        }
+        
         stage('Deploy Environment') {
             steps {
                 sh """
