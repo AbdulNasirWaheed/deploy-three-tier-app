@@ -56,13 +56,16 @@ FRONTEND_IMAGE=${FRONTEND_TAG_DH}
             }
         }
         stage('Approval for Staging / Prod Deploy') {
-    when {
-        // some condition, e.g. branch 'main'
-        steps {                // ← ERROR: 'steps' is not a valid when condition
-            input message: "Deploy to ${BRANCH_NAME} environment?", ok: "Yes, Deploy"
+            when {
+                anyOf {
+                    branch 'stg'
+                    branch 'prod'
+                }
+            }
+            steps {
+                input message: "Deploy to ${BRANCH_NAME} environment?", ok: "Yes, Deploy"
+            }
         }
-    }
-}
         stage('Deploy Environment') {
             steps {
                 sh """
