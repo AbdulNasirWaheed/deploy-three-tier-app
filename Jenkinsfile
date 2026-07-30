@@ -16,12 +16,11 @@ pipeline {
         stage('Docker Hub Login') {
             steps {
                 dockerLogin('dockerhub_credentials')
-                }
             }
         }
         stage('Build & Tag Images') {
             steps {
-                buildImages('./backend', './fronend', IMAGE_TAG)
+                buildImages('./backend', './frontend', IMAGE_TAG)
             }
         }
         stage('Push Images to Docker Hub') {
@@ -34,7 +33,6 @@ pipeline {
                 prepareEnvFile()
             }
         }
-        
         stage('Deploy Environment') {
             steps {
                 deployApp(COMPOSE_FILE, env.BRANCH_NAME)
