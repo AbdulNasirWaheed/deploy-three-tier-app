@@ -3,13 +3,13 @@ pipeline {
     agent any
 
     environment {
-        // Single assignment: get branch name, fallback to 'main'
+        // Get branch name – fallback to 'main' if the command returns nothing
         BRANCH_NAME = sh(
             returnStdout: true,
             script: '''
-                git branch -r --contains HEAD | grep -o "origin/.*" | sed "s|origin/||" | head -1
+                git branch -r --contains HEAD | grep -o "origin/.*" | sed "s|origin/||" | head -1 || echo main
             '''
-        ).trim() ?: 'main'
+        ).trim()
 
         IMAGE_TAG    = "${BRANCH_NAME}-${env.BUILD_NUMBER}"
         COMPOSE_FILE = "docker-compose.${BRANCH_NAME}.yml"
