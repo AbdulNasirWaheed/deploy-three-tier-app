@@ -3,8 +3,8 @@ pipeline {
     agent any
 
     environment {
-        // Determine branch name – fallback if GIT_BRANCH is not set
-        BRANCH_NAME = env.GIT_BRANCH ?: sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
+        // Branch name: use GIT_BRANCH (set by checkout), fallback to 'main'
+        BRANCH_NAME = "${env.GIT_BRANCH ?: 'main'}"
         IMAGE_TAG    = "${BRANCH_NAME}-${env.BUILD_NUMBER}"
         COMPOSE_FILE = "docker-compose.${BRANCH_NAME}.yml"
     }
@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm   // or checkoutSource() if you prefer the shared library
+                checkout scm
             }
         }
         stage('Docker Login') {
