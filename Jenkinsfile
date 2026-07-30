@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     environment {
-        // Get branch name – fallback to 'main' if the command returns nothing
+        // Get branch name – fallback to 'main' if command fails
         BRANCH_NAME = sh(
             returnStdout: true,
             script: '''
@@ -12,7 +12,8 @@ pipeline {
         ).trim()
 
         IMAGE_TAG    = "${BRANCH_NAME}-${env.BUILD_NUMBER}"
-        COMPOSE_FILE = "docker-compose.${BRANCH_NAME}.yml"
+        // Use a single compose file (adjust if yours is named differently)
+        COMPOSE_FILE = "docker-compose.yml"
     }
 
     stages {
