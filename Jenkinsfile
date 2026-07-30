@@ -3,8 +3,16 @@ pipeline {
     agent any
 
     environment {
-        // Clean branch name (no "origin/" prefix)
-        BRANCH_NAME = "${sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()}"
+        // Get branch name from remote tracking branch
+        BRANCH_NAME = sh(
+            returnStdout: true,
+            script: '''
+                git branch -r --contains HEAD | grep -o "origin/.*" | sed "s|origin/||" | head -1
+            '''
+        ).trim()
+        // Fallback to 'main' if the above returns empty
+        BRANCH_NAME = BRANCH_NAME ?: 'main'
+
         IMAGE_TAG    = "${BRANCH_NAME}-${env.BUILD_NUMBER}"
         COMPOSE_FILE = "docker-compose.${BRANCH_NAME}.yml"
     }
