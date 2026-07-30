@@ -10,21 +10,27 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/appdb
 
   frontend:
+    build:
+      context: ./frontend
+      args:
+        - REACT_APP_API_URL=http://backend:5000
     image: ${FRONTEND_IMAGE}
     restart: unless-stopped
     ports:
       - "3000:3000"
     depends_on:
       - backend
+    # If your frontend reads REACT_APP_API_URL at runtime (not build time),
+    # you can set it here instead of using a build arg:
+    # environment:
+    #   - REACT_APP_API_URL=http://backend:5000
 
   mongodb:
     image: mongo:latest
     restart: unless-stopped
     volumes:
       - mongo-data:/data/db
-    # No ports exposed to host — backend reaches it via the internal
-    # compose network at "mongodb:27017". Uncomment below only if you
-    # need external access, and lock your AWS security group to your IP.
+    # If you need external access, uncomment below and lock your security group
     # ports:
     #   - "27017:27017"
 
