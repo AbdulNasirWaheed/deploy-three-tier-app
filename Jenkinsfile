@@ -1,49 +1,55 @@
-@library('sharedLib') _
+@Library('sharedLib') _
 pipeline {
     agent any
+
     environment {
-        DOCKERHUB_CREDENTIALS_ID = 'dockerhub_credentials'
-        BRANCH_NAME = "${env.BRANCH_NAME}"
-        IMAGE_TAG   = "${BRANCH_NAME}-${BUILD_NUMBER}"
-        COMPOSE_FILE="docker-compose.yml"
+        IMAGE_TAG    = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+        COMPOSE_FILE = "docker-compose.${env.BRANCH_NAME}.yml"
     }
+
     stages {
-        stage('Checkout Source') {
+        stage('Checkout') {
             steps {
-                checkoutSource()
+                checkout scm
             }
         }
-        stage('Docker Hub Login') {
+        stage('Docker Login') {
             steps {
-                dockerLogin('dockerhub_credentials')
+                dockerLogin('dockerhub-credentials')
             }
         }
-        stage('Build & Tag Images') {
+        stage('Build Images') {
             steps {
                 buildImages('./backend', './frontend', IMAGE_TAG)
             }
         }
-        stage('Push Images to Docker Hub') {
+        stage('Push Images') {
             steps {
                 pushImages()
             }
         }
-        stage('Prepare .env for Compose') {
+        stage('Prepare .env') {
             steps {
                 prepareEnvFile()
             }
         }
-        stage('Deploy Environment') {
+        stage('Deploy') {
             steps {
-                deployApp(COMPOSE_FILE, env.BRANCH_NAME)
+                script {
+                    if (env.BRANCH_NAME == 'stg' || env.BRANCH_NAME == 'prod') {
+                        input message: "Deploy to ${env.BRANCH_NAME}?", ok: "Deploy"
+                    }
+                    deployApp(COMPOSE_FILE, env.BRANCH_NAME)
+                }
             }
         }
-        stage('Cleanup Local Images') {
+        stage('Cleanup') {
             steps {
                 cleanupImages()
             }
         }
     }
+
     post {
         success {
             echo "✅ ${BRANCH_NAME} environment deployed successfully using Docker Hub images!"
