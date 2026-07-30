@@ -15,7 +15,7 @@ pipeline {
         }
         stage('Docker Login') {
             steps {
-                dockerLogin('dockerhub-credentials')
+                dockerLogin('dockerhub_credentials')
             }
         }
         stage('Build Images') {
