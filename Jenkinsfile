@@ -3,19 +3,21 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_TAG    = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
-        COMPOSE_FILE = "docker-compose.${env.BRANCH_NAME}.yml"
+        // Determine branch name – fallback if GIT_BRANCH is not set
+        BRANCH_NAME = env.GIT_BRANCH ?: sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
+        IMAGE_TAG    = "${BRANCH_NAME}-${env.BUILD_NUMBER}"
+        COMPOSE_FILE = "docker-compose.${BRANCH_NAME}.yml"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                checkout scm   // or checkoutSource() if you prefer the shared library
             }
         }
         stage('Docker Login') {
             steps {
-                dockerLogin('dockerhub_credentials')
+                dockerLogin('dockerhub-credentials')
             }
         }
         stage('Build Images') {
@@ -36,10 +38,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    if (env.BRANCH_NAME == 'stg' || env.BRANCH_NAME == 'prod') {
-                        input message: "Deploy to ${env.BRANCH_NAME}?", ok: "Deploy"
+                    // Manual approval only for staging/production
+                    if (BRANCH_NAME == 'stg' || BRANCH_NAME == 'prod') {
+                        input message: "Deploy to ${BRANCH_NAME}?", ok: "Deploy"
                     }
-                    deployApp(COMPOSE_FILE, env.BRANCH_NAME)
+                    deployApp(COMPOSE_FILE, BRANCH_NAME)
                 }
             }
         }
